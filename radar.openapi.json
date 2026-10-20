@@ -1,0 +1,1226 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Radar de Concentração de Data Centers",
+    "version": "1.0.0",
+    "description": "Fonte: data_center_importacao. Regras e limitações: RADAR_API.md."
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "paths": {
+    "/api/radar/overview": {
+      "get": {
+        "tags": [
+          "Radar"
+        ],
+        "summary": "Indicadores do dataset",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "UF oficial, caixa indiferente."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Norte, Nordeste, Centro-Oeste, Sudeste ou Sul."
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "installationType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta calculada dinamicamente; ausentes numéricos são null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Metrics"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Filtro, UF, limite ou ordenação inválida."
+          },
+          "401": {
+            "description": "Basic Auth obrigatório."
+          }
+        }
+      }
+    },
+    "/api/radar/states": {
+      "get": {
+        "tags": [
+          "Radar"
+        ],
+        "summary": "Indicadores por UF",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "UF oficial, caixa indiferente."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Norte, Nordeste, Centro-Oeste, Sudeste ou Sul."
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "installationType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "installations",
+              "enum": [
+                "installations",
+                "operators",
+                "municipalities",
+                "networks",
+                "averageNetworks",
+                "ix",
+                "carriers"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "desc",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta calculada dinamicamente; ausentes numéricos são null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/State"
+                  }
+                },
+                "example": []
+              }
+            }
+          },
+          "400": {
+            "description": "Filtro, UF, limite ou ordenação inválida."
+          },
+          "401": {
+            "description": "Basic Auth obrigatório."
+          }
+        }
+      }
+    },
+    "/api/radar/states/{uf}": {
+      "get": {
+        "tags": [
+          "Radar"
+        ],
+        "summary": "Detalhe estadual e dois rankings top 10",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "UF oficial, caixa indiferente."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Norte, Nordeste, Centro-Oeste, Sudeste ou Sul."
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "installationType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "uf",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta calculada dinamicamente; ausentes numéricos são null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Filtro, UF, limite ou ordenação inválida."
+          },
+          "401": {
+            "description": "Basic Auth obrigatório."
+          },
+          "404": {
+            "description": "UF válida sem registros no conjunto filtrado."
+          }
+        }
+      }
+    },
+    "/api/radar/states/{uf}/cities": {
+      "get": {
+        "tags": [
+          "Radar"
+        ],
+        "summary": "Municípios do estado",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "UF oficial, caixa indiferente."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Norte, Nordeste, Centro-Oeste, Sudeste ou Sul."
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "installationType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "uf",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "installations",
+              "enum": [
+                "installations",
+                "operators",
+                "networks",
+                "averageNetworks",
+                "ix",
+                "carriers"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "desc",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta calculada dinamicamente; ausentes numéricos são null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/City"
+                  }
+                },
+                "example": []
+              }
+            }
+          },
+          "400": {
+            "description": "Filtro, UF, limite ou ordenação inválida."
+          },
+          "401": {
+            "description": "Basic Auth obrigatório."
+          },
+          "404": {
+            "description": "UF válida sem registros no conjunto filtrado."
+          }
+        }
+      }
+    },
+    "/api/radar/operators/ranking": {
+      "get": {
+        "tags": [
+          "Radar"
+        ],
+        "summary": "Ranking de operadores por instalações",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "UF oficial, caixa indiferente."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Norte, Nordeste, Centro-Oeste, Sudeste ou Sul."
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "installationType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta calculada dinamicamente; ausentes numéricos são null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Operator"
+                  }
+                },
+                "example": []
+              }
+            }
+          },
+          "400": {
+            "description": "Filtro, UF, limite ou ordenação inválida."
+          },
+          "401": {
+            "description": "Basic Auth obrigatório."
+          }
+        }
+      }
+    },
+    "/api/radar/map": {
+      "get": {
+        "tags": [
+          "Radar"
+        ],
+        "summary": "Coordenadas válidas e precisão original",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "UF oficial, caixa indiferente."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Norte, Nordeste, Centro-Oeste, Sudeste ou Sul."
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "installationType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta calculada dinamicamente; ausentes numéricos são null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MapPoint"
+                  }
+                },
+                "example": []
+              }
+            }
+          },
+          "400": {
+            "description": "Filtro, UF, limite ou ordenação inválida."
+          },
+          "401": {
+            "description": "Basic Auth obrigatório."
+          }
+        }
+      }
+    },
+    "/api/radar/cities/ranking": {
+      "get": {
+        "tags": [
+          "Radar"
+        ],
+        "summary": "Ranking de municípios",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "UF oficial, caixa indiferente."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Norte, Nordeste, Centro-Oeste, Sudeste ou Sul."
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "installationType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "installations",
+              "enum": [
+                "installations",
+                "operators",
+                "networks",
+                "averageNetworks",
+                "ix",
+                "carriers"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "desc",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta calculada dinamicamente; ausentes numéricos são null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/City"
+                  }
+                },
+                "example": []
+              }
+            }
+          },
+          "400": {
+            "description": "Filtro, UF, limite ou ordenação inválida."
+          },
+          "401": {
+            "description": "Basic Auth obrigatório."
+          }
+        }
+      }
+    },
+    "/api/radar/filters": {
+      "get": {
+        "tags": [
+          "Radar"
+        ],
+        "summary": "Opções presentes na base",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "UF oficial, caixa indiferente."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Norte, Nordeste, Centro-Oeste, Sudeste ou Sul."
+          },
+          {
+            "name": "operator",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          },
+          {
+            "name": "installationType",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade com espaços e caixa normalizados."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consulta calculada dinamicamente; ausentes numéricos são null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Filters"
+                },
+                "example": {
+                  "states": [],
+                  "operators": [],
+                  "installationTypes": [],
+                  "regions": []
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Filtro, UF, limite ou ordenação inválida."
+          },
+          "401": {
+            "description": "Basic Auth obrigatório."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "Metrics": {
+        "type": "object",
+        "required": [
+          "totalInstalacoes",
+          "totalOperadores",
+          "totalMunicipios",
+          "totalEstados",
+          "instalacoesComCoordenadas",
+          "totalRedesRegistradas",
+          "mediaRedesPorInstalacao",
+          "totalIxRegistrados",
+          "mediaIxPorInstalacao",
+          "totalCarriersRegistrados",
+          "mediaCarriersPorInstalacao",
+          "instalacoesComConectividade",
+          "instalacoesComRedes",
+          "instalacoesComIx",
+          "instalacoesComCarriers"
+        ],
+        "properties": {
+          "totalInstalacoes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalOperadores": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalMunicipios": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalEstados": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComCoordenadas": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalRedesRegistradas": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaRedesPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "totalIxRegistrados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaIxPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "totalCarriersRegistrados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaCarriersPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "instalacoesComConectividade": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComRedes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComIx": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComCarriers": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "State": {
+        "type": "object",
+        "required": [
+          "uf",
+          "nome",
+          "totalInstalacoes",
+          "totalOperadores",
+          "totalMunicipios",
+          "participacaoNacional",
+          "totalRedesRegistradas",
+          "mediaRedesPorInstalacao",
+          "totalIxRegistrados",
+          "mediaIxPorInstalacao",
+          "totalCarriersRegistrados",
+          "mediaCarriersPorInstalacao",
+          "instalacoesComConectividade",
+          "instalacoesComRedes",
+          "instalacoesComIx",
+          "instalacoesComCarriers",
+          "instalacoesComCoordenadas"
+        ],
+        "properties": {
+          "uf": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "totalInstalacoes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalOperadores": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalMunicipios": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "participacaoNacional": {
+            "type": "number",
+            "description": "Numerador filtrado; denominador nacional SEM filtros, participação no dataset."
+          },
+          "totalRedesRegistradas": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaRedesPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "totalIxRegistrados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaIxPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "totalCarriersRegistrados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaCarriersPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "instalacoesComConectividade": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComRedes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComIx": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComCarriers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComCoordenadas": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "City": {
+        "type": "object",
+        "required": [
+          "municipio",
+          "uf",
+          "codigoIbge",
+          "totalInstalacoes",
+          "totalOperadores",
+          "totalRedesRegistradas",
+          "mediaRedesPorInstalacao",
+          "totalIxRegistrados",
+          "totalCarriersRegistrados"
+        ],
+        "properties": {
+          "municipio": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "uf": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "codigoIbge": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "totalInstalacoes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalOperadores": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalRedesRegistradas": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaRedesPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "totalIxRegistrados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "totalCarriersRegistrados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      },
+      "Operator": {
+        "type": "object",
+        "required": [
+          "operador",
+          "totalInstalacoes",
+          "totalEstados",
+          "totalMunicipios",
+          "totalRedesRegistradas"
+        ],
+        "properties": {
+          "operador": {
+            "type": "string"
+          },
+          "totalInstalacoes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalEstados": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalMunicipios": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalRedesRegistradas": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      },
+      "StateDetail": {
+        "type": "object",
+        "required": [
+          "uf",
+          "nome",
+          "totalInstalacoes",
+          "totalOperadores",
+          "totalMunicipios",
+          "participacaoNacional",
+          "totalRedesRegistradas",
+          "mediaRedesPorInstalacao",
+          "totalIxRegistrados",
+          "mediaIxPorInstalacao",
+          "totalCarriersRegistrados",
+          "mediaCarriersPorInstalacao",
+          "instalacoesComConectividade",
+          "instalacoesComRedes",
+          "instalacoesComIx",
+          "instalacoesComCarriers",
+          "instalacoesComCoordenadas",
+          "operadores",
+          "municipios"
+        ],
+        "properties": {
+          "uf": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "totalInstalacoes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalOperadores": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalMunicipios": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "participacaoNacional": {
+            "type": "number",
+            "description": "Numerador filtrado; denominador nacional SEM filtros, participação no dataset."
+          },
+          "totalRedesRegistradas": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaRedesPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "totalIxRegistrados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaIxPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "totalCarriersRegistrados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mediaCarriersPorInstalacao": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "instalacoesComConectividade": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComRedes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComIx": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComCarriers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "instalacoesComCoordenadas": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "operadores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Operator"
+            }
+          },
+          "municipios": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/City"
+            }
+          }
+        }
+      },
+      "MapPoint": {
+        "type": "object",
+        "required": [
+          "id",
+          "operador",
+          "unidade",
+          "municipio",
+          "uf",
+          "latitude",
+          "longitude",
+          "precisaoGeo",
+          "tipoInstalacao",
+          "redesConectadas",
+          "ixConectados",
+          "carriers"
+        ],
+        "properties": {
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "id_original textual; não é PK nem ID do cadastro JPA."
+          },
+          "operador": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unidade": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "municipio": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "uf": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "precisaoGeo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tipoInstalacao": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "redesConectadas": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "ixConectados": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "carriers": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      },
+      "Filters": {
+        "type": "object",
+        "required": [
+          "states",
+          "operators",
+          "installationTypes",
+          "regions"
+        ],
+        "properties": {
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "operators": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "installationTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "regions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

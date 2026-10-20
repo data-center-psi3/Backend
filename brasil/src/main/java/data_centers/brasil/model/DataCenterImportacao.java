@@ -1,0 +1,3 @@
+package data_centers.brasil.model;
+/** Linha bruta da tabela sem chave primária; persistida por JDBC. */
+public record DataCenterImportacao(String idOriginal, String operador, String unidade, String municipio, String uf, String codigoIbge, String endereco, String latitude, String longitude, String precisaoGeo, String tipoInstalacao, String statusOperacional, String inicioOperacao, String potenciaTiMwUnidade, String potenciaCampusMw, String areaM2Unidade, String redesConectadas, String ixConectados, String carriers, String voltadaIa, String resfriamento, String fonteEnergia, String pueDeclarado, String wueDeclarado, String certificacoes, String robustezEvidencia, String fonteUrl, String dataLevantamento) {}

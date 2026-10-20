@@ -1,0 +1,100 @@
+CREATE TABLE data_center (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    empresa VARCHAR(150),
+    cidade VARCHAR(100) NOT NULL,
+    estado VARCHAR(2) NOT NULL,
+    pais VARCHAR(50) DEFAULT 'Brasil',
+    latitude DECIMAL(10,7),
+    longitude DECIMAL(10,7),
+    descricao TEXT,
+    potencia_mw DECIMAL(10,2),
+    area_m2 DECIMAL(12,2),
+    tipo_instalacao VARCHAR(100),
+    status_validacao VARCHAR(30),
+    data_validacao DATE
+);
+
+CREATE TABLE fonte (
+    id SERIAL PRIMARY KEY,
+    instituicao VARCHAR(150) NOT NULL,
+    titulo VARCHAR(200) NOT NULL,
+    url TEXT,
+    data_publicacao DATE,
+    data_consulta DATE NOT NULL
+);
+
+CREATE TABLE indicador_ambiental (
+    id SERIAL PRIMARY KEY,
+    data_center_id INTEGER NOT NULL REFERENCES data_center(id),
+    tipo VARCHAR(100) NOT NULL,
+    valor DECIMAL(15,4),
+    unidade VARCHAR(50),
+    periodo VARCHAR(30),
+    fonte_id INTEGER REFERENCES fonte(id),
+    observacoes TEXT
+);
+
+CREATE TABLE beneficio (
+    id SERIAL PRIMARY KEY,
+    data_center_id INTEGER NOT NULL REFERENCES data_center(id),
+    tipo VARCHAR(50) NOT NULL,
+    descricao TEXT NOT NULL,
+    fonte_id INTEGER REFERENCES fonte(id)
+);
+
+CREATE TABLE conteudo_pesquisa (
+    id SERIAL PRIMARY KEY,
+    data_center_id INTEGER REFERENCES data_center(id),
+    titulo VARCHAR(200) NOT NULL,
+    conteudo TEXT NOT NULL,
+    categoria VARCHAR(50),
+    fonte_id INTEGER NOT NULL REFERENCES fonte(id),
+    data_publicacao DATE
+);
+
+CREATE TABLE data_center_importacao (
+    id_original TEXT,
+    operador TEXT,
+    unidade TEXT,
+    municipio TEXT,
+    uf TEXT,
+    codigo_ibge TEXT,
+    endereco TEXT,
+    latitude TEXT,
+    longitude TEXT,
+    precisao_geo TEXT,
+    tipo_instalacao TEXT,
+    status_operacional TEXT,
+    inicio_operacao TEXT,
+    potencia_ti_mw_unidade TEXT,
+    potencia_campus_mw TEXT,
+    area_m2_unidade TEXT,
+    redes_conectadas TEXT,
+    ix_conectados TEXT,
+    carriers TEXT,
+    voltada_ia TEXT,
+    resfriamento TEXT,
+    fonte_energia TEXT,
+    pue_declarado TEXT,
+    wue_declarado TEXT,
+    certificacoes TEXT,
+    robustez_evidencia TEXT,
+    fonte_url TEXT,
+    data_levantamento TEXT
+);
+
+CREATE TABLE data_center_fonte (
+    data_center_id INTEGER NOT NULL REFERENCES data_center(id),
+    fonte_id INTEGER NOT NULL REFERENCES fonte(id),
+    PRIMARY KEY (data_center_id, fonte_id)
+);
+
+CREATE INDEX idx_data_center_cidade ON data_center(cidade);
+CREATE INDEX idx_data_center_empresa ON data_center(empresa);
+CREATE INDEX idx_indicador_ambiental_data_center_id ON indicador_ambiental(data_center_id);
+CREATE INDEX idx_indicador_ambiental_tipo ON indicador_ambiental(tipo);
+CREATE INDEX idx_beneficio_data_center_id ON beneficio(data_center_id);
+CREATE INDEX idx_conteudo_pesquisa_data_center_id ON conteudo_pesquisa(data_center_id);
+CREATE INDEX idx_conteudo_pesquisa_categoria ON conteudo_pesquisa(categoria);
+CREATE INDEX idx_data_center_importacao_municipio ON data_center_importacao(municipio);

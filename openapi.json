@@ -1,0 +1,5334 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Data Centers Brasil API",
+    "version": "0.0.1-SNAPSHOT",
+    "description": "Contrato atual do backend. Guia: DOCUMENTACAO_API.md. Basic Auth em todas as rotas. Não há JWT. CORS permite http://localhost:5173 e http://127.0.0.1:5173."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Servidor local"
+    }
+  ],
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ],
+  "paths": {
+    "/api/radar/overview": { "$ref": "./radar.openapi.json#/paths/~1api~1radar~1overview" },
+    "/api/radar/states": { "$ref": "./radar.openapi.json#/paths/~1api~1radar~1states" },
+    "/api/radar/states/{uf}": { "$ref": "./radar.openapi.json#/paths/~1api~1radar~1states~1{uf}" },
+    "/api/radar/states/{uf}/cities": { "$ref": "./radar.openapi.json#/paths/~1api~1radar~1states~1{uf}~1cities" },
+    "/api/radar/operators/ranking": { "$ref": "./radar.openapi.json#/paths/~1api~1radar~1operators~1ranking" },
+    "/api/radar/map": { "$ref": "./radar.openapi.json#/paths/~1api~1radar~1map" },
+    "/api/radar/cities/ranking": { "$ref": "./radar.openapi.json#/paths/~1api~1radar~1cities~1ranking" },
+    "/api/radar/filters": { "$ref": "./radar.openapi.json#/paths/~1api~1radar~1filters" },
+    "/api/data-centers": {
+      "get": {
+        "tags": [
+          "Data centers"
+        ],
+        "summary": "GET /api/data-centers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "campo,asc ou campo,desc; pode repetir. Sem ordenação padrão."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataCenterPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_data_centers"
+      },
+      "post": {
+        "tags": [
+          "Data centers"
+        ],
+        "summary": "POST /api/data-centers",
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataCenterResponse"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Caminho do recurso criado.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataCenterRequest"
+              }
+            }
+          }
+        },
+        "operationId": "post_api_data_centers"
+      }
+    },
+    "/api/data-centers/{id}": {
+      "get": {
+        "tags": [
+          "Data centers"
+        ],
+        "summary": "GET /api/data-centers/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataCenterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_data_centers_id"
+      },
+      "put": {
+        "tags": [
+          "Data centers"
+        ],
+        "summary": "PUT /api/data-centers/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataCenterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataCenterRequest"
+              }
+            }
+          }
+        },
+        "description": "Substitui todos os campos editáveis. Opcionais omitidos ficam null, exceto pais que assume Brasil.",
+        "operationId": "put_api_data_centers_id"
+      },
+      "delete": {
+        "tags": [
+          "Data centers"
+        ],
+        "summary": "DELETE /api/data-centers/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso; corpo vazio."
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "delete_api_data_centers_id"
+      }
+    },
+    "/api/fontes": {
+      "get": {
+        "tags": [
+          "Fontes"
+        ],
+        "summary": "GET /api/fontes",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "campo,asc ou campo,desc; pode repetir. Sem ordenação padrão."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FontePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_fontes"
+      },
+      "post": {
+        "tags": [
+          "Fontes"
+        ],
+        "summary": "POST /api/fontes",
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FonteResponse"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Caminho do recurso criado.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FonteRequest"
+              }
+            }
+          }
+        },
+        "operationId": "post_api_fontes"
+      }
+    },
+    "/api/fontes/{id}": {
+      "get": {
+        "tags": [
+          "Fontes"
+        ],
+        "summary": "GET /api/fontes/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FonteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_fontes_id"
+      },
+      "put": {
+        "tags": [
+          "Fontes"
+        ],
+        "summary": "PUT /api/fontes/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FonteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FonteRequest"
+              }
+            }
+          }
+        },
+        "description": "Substitui todos os campos editáveis. Opcionais omitidos ficam null, exceto pais que assume Brasil.",
+        "operationId": "put_api_fontes_id"
+      },
+      "delete": {
+        "tags": [
+          "Fontes"
+        ],
+        "summary": "DELETE /api/fontes/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso; corpo vazio."
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "delete_api_fontes_id"
+      }
+    },
+    "/api/indicadores-ambientais": {
+      "get": {
+        "tags": [
+          "Indicadores ambientais"
+        ],
+        "summary": "GET /api/indicadores-ambientais",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "campo,asc ou campo,desc; pode repetir. Sem ordenação padrão."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndicadorAmbientalPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_indicadores_ambientais"
+      },
+      "post": {
+        "tags": [
+          "Indicadores ambientais"
+        ],
+        "summary": "POST /api/indicadores-ambientais",
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndicadorAmbientalResponse"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Caminho do recurso criado.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndicadorAmbientalRequest"
+              }
+            }
+          }
+        },
+        "operationId": "post_api_indicadores_ambientais"
+      }
+    },
+    "/api/indicadores-ambientais/{id}": {
+      "get": {
+        "tags": [
+          "Indicadores ambientais"
+        ],
+        "summary": "GET /api/indicadores-ambientais/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndicadorAmbientalResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_indicadores_ambientais_id"
+      },
+      "put": {
+        "tags": [
+          "Indicadores ambientais"
+        ],
+        "summary": "PUT /api/indicadores-ambientais/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndicadorAmbientalResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndicadorAmbientalRequest"
+              }
+            }
+          }
+        },
+        "description": "Substitui todos os campos editáveis. Opcionais omitidos ficam null, exceto pais que assume Brasil.",
+        "operationId": "put_api_indicadores_ambientais_id"
+      },
+      "delete": {
+        "tags": [
+          "Indicadores ambientais"
+        ],
+        "summary": "DELETE /api/indicadores-ambientais/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso; corpo vazio."
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "delete_api_indicadores_ambientais_id"
+      }
+    },
+    "/api/beneficios": {
+      "get": {
+        "tags": [
+          "Benefícios"
+        ],
+        "summary": "GET /api/beneficios",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "campo,asc ou campo,desc; pode repetir. Sem ordenação padrão."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeneficioPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_beneficios"
+      },
+      "post": {
+        "tags": [
+          "Benefícios"
+        ],
+        "summary": "POST /api/beneficios",
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeneficioResponse"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Caminho do recurso criado.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BeneficioRequest"
+              }
+            }
+          }
+        },
+        "operationId": "post_api_beneficios"
+      }
+    },
+    "/api/beneficios/{id}": {
+      "get": {
+        "tags": [
+          "Benefícios"
+        ],
+        "summary": "GET /api/beneficios/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeneficioResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_beneficios_id"
+      },
+      "put": {
+        "tags": [
+          "Benefícios"
+        ],
+        "summary": "PUT /api/beneficios/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeneficioResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BeneficioRequest"
+              }
+            }
+          }
+        },
+        "description": "Substitui todos os campos editáveis. Opcionais omitidos ficam null, exceto pais que assume Brasil.",
+        "operationId": "put_api_beneficios_id"
+      },
+      "delete": {
+        "tags": [
+          "Benefícios"
+        ],
+        "summary": "DELETE /api/beneficios/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso; corpo vazio."
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "delete_api_beneficios_id"
+      }
+    },
+    "/api/conteudos-pesquisa": {
+      "get": {
+        "tags": [
+          "Conteúdos de pesquisa"
+        ],
+        "summary": "GET /api/conteudos-pesquisa",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "campo,asc ou campo,desc; pode repetir. Sem ordenação padrão."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConteudoPesquisaPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_conteudos_pesquisa"
+      },
+      "post": {
+        "tags": [
+          "Conteúdos de pesquisa"
+        ],
+        "summary": "POST /api/conteudos-pesquisa",
+        "responses": {
+          "201": {
+            "description": "Criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConteudoPesquisaResponse"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "description": "Caminho do recurso criado.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConteudoPesquisaRequest"
+              }
+            }
+          }
+        },
+        "operationId": "post_api_conteudos_pesquisa"
+      }
+    },
+    "/api/conteudos-pesquisa/{id}": {
+      "get": {
+        "tags": [
+          "Conteúdos de pesquisa"
+        ],
+        "summary": "GET /api/conteudos-pesquisa/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConteudoPesquisaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_conteudos_pesquisa_id"
+      },
+      "put": {
+        "tags": [
+          "Conteúdos de pesquisa"
+        ],
+        "summary": "PUT /api/conteudos-pesquisa/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConteudoPesquisaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConteudoPesquisaRequest"
+              }
+            }
+          }
+        },
+        "description": "Substitui todos os campos editáveis. Opcionais omitidos ficam null, exceto pais que assume Brasil.",
+        "operationId": "put_api_conteudos_pesquisa_id"
+      },
+      "delete": {
+        "tags": [
+          "Conteúdos de pesquisa"
+        ],
+        "summary": "DELETE /api/conteudos-pesquisa/{id}",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso; corpo vazio."
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Registro ou referência inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Vínculos ou restrições de integridade impedem a operação.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "delete_api_conteudos_pesquisa_id"
+      }
+    },
+    "/api/data-centers/filtro": {
+      "get": {
+        "tags": [
+          "Consultas"
+        ],
+        "summary": "GET /api/data-centers/filtro",
+        "parameters": [
+          {
+            "name": "cidades",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": false,
+            "description": "Lista por vírgulas, igualdade exata."
+          },
+          {
+            "name": "estado",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Convertido para maiúsculas."
+          },
+          {
+            "name": "empresa",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Igualdade sem diferenciar maiúsculas/minúsculas, não busca parcial."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "campo,asc ou campo,desc; pode repetir. Sem ordenação padrão."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataCenterPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_data_centers_filtro"
+      }
+    },
+    "/api/mapa": {
+      "get": {
+        "tags": [
+          "Consultas"
+        ],
+        "summary": "GET /api/mapa",
+        "parameters": [
+          {
+            "name": "cidades",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": false,
+            "description": "Lista por vírgulas, igualdade exata."
+          },
+          {
+            "name": "estado",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Convertido para maiúsculas."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "campo,asc ou campo,desc; pode repetir. Sem ordenação padrão."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapaPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "description": "Somente cadastros com latitude e longitude.",
+        "operationId": "get_api_mapa"
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "tags": [
+          "Consultas"
+        ],
+        "summary": "GET /api/dashboard",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "description": "Sem filtros; array por cidade, ordenado por quantidade decrescente e cidade crescente. Potência desconhecida não contribui à soma.",
+        "operationId": "get_api_dashboard"
+      }
+    },
+    "/api/data-centers/{dataCenterId}/fontes": {
+      "get": {
+        "tags": [
+          "Vínculos"
+        ],
+        "summary": "GET /api/data-centers/{dataCenterId}/fontes",
+        "parameters": [
+          {
+            "name": "dataCenterId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "description": "Ordena o vínculo; use id.fonteId,asc."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FontePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data center, fonte ou vínculo inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "operationId": "get_api_data_centers_dataCenterId_fontes"
+      }
+    },
+    "/api/data-centers/{dataCenterId}/fontes/{fonteId}": {
+      "put": {
+        "tags": [
+          "Vínculos"
+        ],
+        "summary": "PUT /api/data-centers/{dataCenterId}/fontes/{fonteId}",
+        "parameters": [
+          {
+            "name": "fonteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "dataCenterId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso; corpo vazio."
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data center, fonte ou vínculo inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "description": "Sem corpo; repetir não duplica o vínculo.",
+        "operationId": "put_api_data_centers_dataCenterId_fontes_fonteId"
+      },
+      "delete": {
+        "tags": [
+          "Vínculos"
+        ],
+        "summary": "DELETE /api/data-centers/{dataCenterId}/fontes/{fonteId}",
+        "parameters": [
+          {
+            "name": "fonteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "dataCenterId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucesso; corpo vazio."
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data center, fonte ou vínculo inexistente.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "description": "Sem corpo; remove somente o vínculo. Repetir retorna 404.",
+        "operationId": "delete_api_data_centers_dataCenterId_fontes_fonteId"
+      }
+    },
+    "/api/importacoes": {
+      "get": {
+        "tags": [
+          "Importações"
+        ],
+        "summary": "GET /api/importacoes",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportacaoPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "description": "Textos brutos; ordenação fixa por id original, operador e unidade.",
+        "operationId": "get_api_importacoes"
+      },
+      "post": {
+        "tags": [
+          "Importações"
+        ],
+        "summary": "POST /api/importacoes",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportacaoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Upload acima do limite multipart.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incompatível.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "arquivo"
+                ],
+                "properties": {
+                  "arquivo": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Upload UTF-8 delimitado por ;, 28 colunas. Apenas tabela bruta; pode duplicar no reenvio. Limite atual: 1 MB por arquivo, 50000 linhas.",
+        "operationId": "post_api_importacoes"
+      }
+    },
+    "/api/importacoes/previa": {
+      "get": {
+        "tags": [
+          "Importações"
+        ],
+        "summary": "GET /api/importacoes/previa",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CargaPreviaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "description": "Sem corpo; lê CSV incluído sem gravar nem verificar carga no banco.",
+        "operationId": "get_api_importacoes_previa"
+      }
+    },
+    "/api/importacoes/popular": {
+      "post": {
+        "tags": [
+          "Importações"
+        ],
+        "summary": "POST /api/importacoes/popular",
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CargaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados ou parâmetros inválidos.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Basic Auth ausente ou inválido. Corpo não garantido.",
+            "headers": {
+              "WWW-Authenticate": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Acesso negado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método HTTP não suportado.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Fonte ou cadastro ambíguos; carga revertida.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro inesperado; corpo não garantido."
+          }
+        },
+        "description": "Sem corpo. Carga síncrona e transacional do CSV incluído; repetição ignora registros rastreados pela fonte vinculada.",
+        "operationId": "post_api_importacoes_popular"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
+    "schemas": {
+      "DataCenterRequest": {
+        "type": "object",
+        "required": [
+          "nome",
+          "cidade",
+          "estado"
+        ],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Obrigatório, não vazio; até 150 caracteres.",
+            "maxLength": 150,
+            "minLength": 1
+          },
+          "empresa": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 150 caracteres.",
+            "maxLength": 150
+          },
+          "cidade": {
+            "type": "string",
+            "description": "Obrigatório, não vazio; até 100 caracteres.",
+            "maxLength": 100,
+            "minLength": 1
+          },
+          "estado": {
+            "type": "string",
+            "description": "Duas letras maiúsculas: SP, RJ etc.; sem enum de UFs.",
+            "maxLength": 2,
+            "minLength": 2,
+            "pattern": "^[A-Z]{2}$"
+          },
+          "pais": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 50 caracteres; omitido ou null vira Brasil.",
+            "maxLength": 50
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "De -90 a 90; até 7 casas decimais.",
+            "minimum": -90,
+            "maximum": 90
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "De -180 a 180; até 7 casas decimais.",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "descricao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Texto livre."
+          },
+          "potenciaMw": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Não negativo; até 8 dígitos inteiros e 2 casas decimais.",
+            "minimum": 0
+          },
+          "areaM2": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Não negativo; até 10 dígitos inteiros e 2 casas decimais.",
+            "minimum": 0
+          },
+          "tipoInstalacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 100 caracteres; texto livre.",
+            "maxLength": 100
+          },
+          "statusValidacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 30 caracteres; sem enum obrigatório.",
+            "maxLength": 30
+          },
+          "dataValidacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YYYY-MM-DD; sem restrição passada/futura.",
+            "format": "date"
+          }
+        },
+        "example": {
+          "nome": "Campus Campinas",
+          "empresa": "Operador Exemplo",
+          "cidade": "Campinas",
+          "estado": "SP",
+          "pais": "Brasil",
+          "latitude": -22.9056,
+          "longitude": -47.0608,
+          "descricao": "Campus de infraestrutura digital.",
+          "potenciaMw": 10.25,
+          "areaM2": 12000,
+          "tipoInstalacao": "Campus",
+          "statusValidacao": "PENDENTE",
+          "dataValidacao": null
+        }
+      },
+      "DataCenterResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "empresa",
+          "cidade",
+          "estado",
+          "pais",
+          "latitude",
+          "longitude",
+          "descricao",
+          "potenciaMw",
+          "areaM2",
+          "tipoInstalacao",
+          "statusValidacao",
+          "dataValidacao"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "nome": {
+            "type": "string",
+            "description": "Obrigatório, não vazio; até 150 caracteres."
+          },
+          "empresa": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 150 caracteres."
+          },
+          "cidade": {
+            "type": "string",
+            "description": "Obrigatório, não vazio; até 100 caracteres."
+          },
+          "estado": {
+            "type": "string",
+            "description": "Duas letras maiúsculas: SP, RJ etc.; sem enum de UFs."
+          },
+          "pais": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 50 caracteres; omitido ou null vira Brasil."
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "De -90 a 90; até 7 casas decimais."
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "De -180 a 180; até 7 casas decimais."
+          },
+          "descricao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Texto livre."
+          },
+          "potenciaMw": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Não negativo; até 8 dígitos inteiros e 2 casas decimais."
+          },
+          "areaM2": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Não negativo; até 10 dígitos inteiros e 2 casas decimais."
+          },
+          "tipoInstalacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 100 caracteres; texto livre."
+          },
+          "statusValidacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 30 caracteres; sem enum obrigatório."
+          },
+          "dataValidacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YYYY-MM-DD; sem restrição passada/futura.",
+            "format": "date"
+          }
+        },
+        "example": {
+          "id": 1,
+          "nome": "Campus Campinas",
+          "empresa": "Operador Exemplo",
+          "cidade": "Campinas",
+          "estado": "SP",
+          "pais": "Brasil",
+          "latitude": -22.9056,
+          "longitude": -47.0608,
+          "descricao": "Campus de infraestrutura digital.",
+          "potenciaMw": 10.25,
+          "areaM2": 12000,
+          "tipoInstalacao": "Campus",
+          "statusValidacao": "PENDENTE",
+          "dataValidacao": null
+        }
+      },
+      "FonteRequest": {
+        "type": "object",
+        "required": [
+          "instituicao",
+          "titulo",
+          "dataConsulta"
+        ],
+        "properties": {
+          "instituicao": {
+            "type": "string",
+            "description": "Não vazio; até 150 caracteres.",
+            "maxLength": 150,
+            "minLength": 1
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Não vazio; até 200 caracteres.",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Texto livre; sem validação de URL no DTO."
+          },
+          "dataPublicacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YYYY-MM-DD.",
+            "format": "date"
+          },
+          "dataConsulta": {
+            "type": "string",
+            "description": "Obrigatório; YYYY-MM-DD.",
+            "format": "date",
+            "minLength": 1
+          }
+        },
+        "example": {
+          "instituicao": "Instituto Exemplo",
+          "titulo": "Relatório de infraestrutura",
+          "url": "https://example.com/relatorio",
+          "dataPublicacao": "2026-09-22",
+          "dataConsulta": "2026-10-13"
+        }
+      },
+      "FonteResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "instituicao",
+          "titulo",
+          "url",
+          "dataPublicacao",
+          "dataConsulta"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "instituicao": {
+            "type": "string",
+            "description": "Não vazio; até 150 caracteres."
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Não vazio; até 200 caracteres."
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Texto livre; sem validação de URL no DTO."
+          },
+          "dataPublicacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YYYY-MM-DD.",
+            "format": "date"
+          },
+          "dataConsulta": {
+            "type": "string",
+            "description": "Obrigatório; YYYY-MM-DD.",
+            "format": "date"
+          }
+        },
+        "example": {
+          "id": 1,
+          "instituicao": "Instituto Exemplo",
+          "titulo": "Relatório de infraestrutura",
+          "url": "https://example.com/relatorio",
+          "dataPublicacao": "2026-09-22",
+          "dataConsulta": "2026-10-13"
+        }
+      },
+      "IndicadorAmbientalRequest": {
+        "type": "object",
+        "required": [
+          "dataCenterId",
+          "tipo"
+        ],
+        "properties": {
+          "dataCenterId": {
+            "type": "integer",
+            "description": "ID positivo de um data center existente.",
+            "minimum": 1
+          },
+          "tipo": {
+            "type": "string",
+            "description": "Não vazio; até 100 caracteres. Ex.: PUE, WUE.",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "valor": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Até 11 dígitos inteiros e 4 casas decimais; o CRUD aceita negativos."
+          },
+          "unidade": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 50 caracteres.",
+            "maxLength": 50
+          },
+          "periodo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 30 caracteres; texto livre, não date.",
+            "maxLength": 30
+          },
+          "fonteId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "ID positivo de fonte existente, ou null.",
+            "minimum": 1
+          },
+          "observacoes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Texto livre."
+          }
+        },
+        "example": {
+          "dataCenterId": 1,
+          "tipo": "PUE",
+          "valor": 1.25,
+          "unidade": "índice",
+          "periodo": "2026",
+          "fonteId": 1,
+          "observacoes": "Valor declarado pelo operador."
+        }
+      },
+      "IndicadorAmbientalResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "dataCenterId",
+          "tipo",
+          "valor",
+          "unidade",
+          "periodo",
+          "fonteId",
+          "observacoes"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dataCenterId": {
+            "type": "integer",
+            "description": "ID positivo de um data center existente.",
+            "minimum": 1
+          },
+          "tipo": {
+            "type": "string",
+            "description": "Não vazio; até 100 caracteres. Ex.: PUE, WUE."
+          },
+          "valor": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Até 11 dígitos inteiros e 4 casas decimais; o CRUD aceita negativos."
+          },
+          "unidade": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 50 caracteres."
+          },
+          "periodo": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 30 caracteres; texto livre, não date."
+          },
+          "fonteId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "ID positivo de fonte existente, ou null.",
+            "minimum": 1
+          },
+          "observacoes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Texto livre."
+          }
+        },
+        "example": {
+          "id": 1,
+          "dataCenterId": 1,
+          "tipo": "PUE",
+          "valor": 1.25,
+          "unidade": "índice",
+          "periodo": "2026",
+          "fonteId": 1,
+          "observacoes": "Valor declarado pelo operador."
+        }
+      },
+      "BeneficioRequest": {
+        "type": "object",
+        "required": [
+          "dataCenterId",
+          "tipo",
+          "descricao"
+        ],
+        "properties": {
+          "dataCenterId": {
+            "type": "integer",
+            "description": "ID positivo de um data center existente.",
+            "minimum": 1
+          },
+          "tipo": {
+            "type": "string",
+            "description": "Não vazio; até 50 caracteres.",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Obrigatório, não vazio.",
+            "minLength": 1
+          },
+          "fonteId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "ID positivo de fonte existente, ou null.",
+            "minimum": 1
+          }
+        },
+        "example": {
+          "dataCenterId": 1,
+          "tipo": "Emprego",
+          "descricao": "Geração de empregos locais.",
+          "fonteId": 1
+        }
+      },
+      "BeneficioResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "dataCenterId",
+          "tipo",
+          "descricao",
+          "fonteId"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dataCenterId": {
+            "type": "integer",
+            "description": "ID positivo de um data center existente.",
+            "minimum": 1
+          },
+          "tipo": {
+            "type": "string",
+            "description": "Não vazio; até 50 caracteres."
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Obrigatório, não vazio."
+          },
+          "fonteId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "ID positivo de fonte existente, ou null.",
+            "minimum": 1
+          }
+        },
+        "example": {
+          "id": 1,
+          "dataCenterId": 1,
+          "tipo": "Emprego",
+          "descricao": "Geração de empregos locais.",
+          "fonteId": 1
+        }
+      },
+      "ConteudoPesquisaRequest": {
+        "type": "object",
+        "required": [
+          "titulo",
+          "conteudo",
+          "fonteId"
+        ],
+        "properties": {
+          "dataCenterId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "ID positivo existente, ou null para pesquisa geral.",
+            "minimum": 1
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Não vazio; até 200 caracteres.",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "conteudo": {
+            "type": "string",
+            "description": "Obrigatório, não vazio.",
+            "minLength": 1
+          },
+          "categoria": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 50 caracteres; sem enum.",
+            "maxLength": 50
+          },
+          "fonteId": {
+            "type": "integer",
+            "description": "ID positivo de fonte existente; obrigatório.",
+            "minimum": 1
+          },
+          "dataPublicacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YYYY-MM-DD.",
+            "format": "date"
+          }
+        },
+        "example": {
+          "dataCenterId": 1,
+          "titulo": "Infraestrutura regional",
+          "conteudo": "Texto do levantamento de infraestrutura regional.",
+          "categoria": "Infraestrutura",
+          "fonteId": 1,
+          "dataPublicacao": "2026-09-22"
+        }
+      },
+      "ConteudoPesquisaResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "dataCenterId",
+          "titulo",
+          "conteudo",
+          "categoria",
+          "fonteId",
+          "dataPublicacao"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dataCenterId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "ID positivo existente, ou null para pesquisa geral.",
+            "minimum": 1
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Não vazio; até 200 caracteres."
+          },
+          "conteudo": {
+            "type": "string",
+            "description": "Obrigatório, não vazio."
+          },
+          "categoria": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 50 caracteres; sem enum."
+          },
+          "fonteId": {
+            "type": "integer",
+            "description": "ID positivo de fonte existente; obrigatório.",
+            "minimum": 1
+          },
+          "dataPublicacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "YYYY-MM-DD.",
+            "format": "date"
+          }
+        },
+        "example": {
+          "id": 1,
+          "dataCenterId": 1,
+          "titulo": "Infraestrutura regional",
+          "conteudo": "Texto do levantamento de infraestrutura regional.",
+          "categoria": "Infraestrutura",
+          "fonteId": 1,
+          "dataPublicacao": "2026-09-22"
+        }
+      },
+      "PageMetadata": {
+        "type": "object",
+        "required": [
+          "size",
+          "number",
+          "totalElements",
+          "totalPages"
+        ],
+        "properties": {
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalElements": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "DataCenterPage": {
+        "type": "object",
+        "required": [
+          "content",
+          "page"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataCenterResponse"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "FontePage": {
+        "type": "object",
+        "required": [
+          "content",
+          "page"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FonteResponse"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "IndicadorAmbientalPage": {
+        "type": "object",
+        "required": [
+          "content",
+          "page"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IndicadorAmbientalResponse"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "BeneficioPage": {
+        "type": "object",
+        "required": [
+          "content",
+          "page"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BeneficioResponse"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "ConteudoPesquisaPage": {
+        "type": "object",
+        "required": [
+          "content",
+          "page"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConteudoPesquisaResponse"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "MapaResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "nome",
+          "empresa",
+          "cidade",
+          "estado",
+          "latitude",
+          "longitude",
+          "potenciaMw",
+          "tipoInstalacao"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "nome": {
+            "type": "string",
+            "description": "Obrigatório, não vazio; até 150 caracteres."
+          },
+          "empresa": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 150 caracteres."
+          },
+          "cidade": {
+            "type": "string",
+            "description": "Obrigatório, não vazio; até 100 caracteres."
+          },
+          "estado": {
+            "type": "string",
+            "description": "Duas letras maiúsculas: SP, RJ etc.; sem enum de UFs."
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "potenciaMw": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Não negativo; até 8 dígitos inteiros e 2 casas decimais."
+          },
+          "tipoInstalacao": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Até 100 caracteres; texto livre."
+          }
+        }
+      },
+      "MapaPage": {
+        "type": "object",
+        "required": [
+          "content",
+          "page"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MapaResponse"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "DashboardResponse": {
+        "type": "object",
+        "required": [
+          "cidade",
+          "quantidadeDataCenters",
+          "potenciaTotalMw"
+        ],
+        "properties": {
+          "cidade": {
+            "type": "string"
+          },
+          "quantidadeDataCenters": {
+            "type": "integer"
+          },
+          "potenciaTotalMw": {
+            "type": "number"
+          }
+        }
+      },
+      "DataCenterImportacao": {
+        "type": "object",
+        "required": [
+          "idOriginal",
+          "operador",
+          "unidade",
+          "municipio",
+          "uf",
+          "codigoIbge",
+          "endereco",
+          "latitude",
+          "longitude",
+          "precisaoGeo",
+          "tipoInstalacao",
+          "statusOperacional",
+          "inicioOperacao",
+          "potenciaTiMwUnidade",
+          "potenciaCampusMw",
+          "areaM2Unidade",
+          "redesConectadas",
+          "ixConectados",
+          "carriers",
+          "voltadaIa",
+          "resfriamento",
+          "fonteEnergia",
+          "pueDeclarado",
+          "wueDeclarado",
+          "certificacoes",
+          "robustezEvidencia",
+          "fonteUrl",
+          "dataLevantamento"
+        ],
+        "properties": {
+          "idOriginal": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operador": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unidade": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "municipio": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "uf": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "codigoIbge": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "endereco": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "latitude": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "longitude": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "precisaoGeo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tipoInstalacao": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "statusOperacional": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "inicioOperacao": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "potenciaTiMwUnidade": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "potenciaCampusMw": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "areaM2Unidade": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "redesConectadas": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ixConectados": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "carriers": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "voltadaIa": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resfriamento": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fonteEnergia": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pueDeclarado": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "wueDeclarado": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "certificacoes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "robustezEvidencia": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fonteUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dataLevantamento": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ImportacaoPage": {
+        "type": "object",
+        "required": [
+          "content",
+          "page"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataCenterImportacao"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "ImportacaoResponse": {
+        "type": "object",
+        "required": [
+          "linhasImportadas"
+        ],
+        "properties": {
+          "linhasImportadas": {
+            "type": "integer"
+          }
+        }
+      },
+      "CargaAviso": {
+        "type": "object",
+        "required": [
+          "idOriginal",
+          "campo",
+          "valorOriginal",
+          "mensagem"
+        ],
+        "properties": {
+          "idOriginal": {
+            "type": "string"
+          },
+          "campo": {
+            "type": "string"
+          },
+          "valorOriginal": {
+            "type": "string"
+          },
+          "mensagem": {
+            "type": "string"
+          }
+        }
+      },
+      "CargaResponse": {
+        "type": "object",
+        "required": [
+          "arquivo",
+          "totalLinhas",
+          "dataCentersCriados",
+          "dataCentersReutilizados",
+          "fontesCriadas",
+          "indicadoresCriados",
+          "conteudosCriados",
+          "linhasBrutasCriadas",
+          "registrosIgnorados",
+          "avisos"
+        ],
+        "properties": {
+          "arquivo": {
+            "type": "string"
+          },
+          "totalLinhas": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "dataCentersCriados": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "dataCentersReutilizados": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "fontesCriadas": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "indicadoresCriados": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "conteudosCriados": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "linhasBrutasCriadas": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "registrosIgnorados": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "avisos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CargaAviso"
+            }
+          }
+        }
+      },
+      "CargaPreviaResponse": {
+        "type": "object",
+        "required": [
+          "arquivo",
+          "totalLinhas",
+          "registrosComCoordenadas",
+          "registrosComPotenciaNumerica",
+          "amostra",
+          "avisos"
+        ],
+        "properties": {
+          "arquivo": {
+            "type": "string"
+          },
+          "totalLinhas": {
+            "type": "integer"
+          },
+          "registrosComCoordenadas": {
+            "type": "integer"
+          },
+          "registrosComPotenciaNumerica": {
+            "type": "integer"
+          },
+          "amostra": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "$ref": "#/components/schemas/DataCenterRequest"
+            }
+          },
+          "avisos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CargaAviso"
+            }
+          }
+        }
+      },
+      "ProblemDetail": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "DefaultError": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "trace": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}

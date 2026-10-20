@@ -1,0 +1,35 @@
+.idea/
+.env
+.env.*
+!.env.example
+
+# Configuracoes locais com variaveis e credenciais
+application.properties
+application-*.properties
+application.yml
+application-*.yml
+application.yaml
+application-*.yaml
+!application-test.properties
+!application-test.yml
+!application-test.yaml
+!application-example.properties
+!application-example.yml
+!application-example.yaml
+
+# Chaves privadas e armazenamentos de credenciais
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+.aws/
+.ssh/
+.netrc
+_netrc
+
+# Logs e arquivos locais do ambiente
+*.log
+.DS_Store
+Thumbs.db

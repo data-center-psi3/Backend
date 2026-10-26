@@ -39,3 +39,4 @@ build/
 
 # Configuracao compartilhada com valores vindos do ambiente
 !/src/main/resources/application.properties
+!/src/main/resources/application-prod.properties

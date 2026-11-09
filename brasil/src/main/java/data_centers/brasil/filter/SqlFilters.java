@@ -16,7 +16,8 @@ public final class SqlFilters {
             // Colunas e expressões vêm exclusivamente da lista permitida em FilterResource.
             String column = condition.field().sqlColumn();
             boolean text = condition.field().type() == TEXT;
-            String expression = text ? "LOWER(" + column + ")" : column;
+            boolean normalized = text && TextNormalization.applies(condition);
+            String expression = normalized ? TextNormalization.sql(column) : text ? "LOWER(" + column + ")" : column;
             Object value = condition.values().getFirst();
             switch (condition.operator()) {
                 case IS_NULL -> predicates.add(column + (Boolean.TRUE.equals(value) ? " IS NULL" : " IS NOT NULL"));
@@ -24,9 +25,9 @@ public final class SqlFilters {
                 case MAX -> { predicates.add(column + " <= ?"); args.add(jdbc(value)); }
                 case IN -> {
                     predicates.add(expression + " IN (" + String.join(", ", Collections.nCopies(condition.values().size(), "?")) + ")");
-                    condition.values().forEach(v -> args.add(text ? v.toString().toLowerCase(Locale.ROOT) : jdbc(v)));
+                    condition.values().forEach(v -> args.add(normalized ? TextNormalization.value(condition, v) : text ? v.toString().toLowerCase(Locale.ROOT) : jdbc(v)));
                 }
-                case EQ -> { predicates.add(expression + " = ?"); args.add(text ? value.toString().toLowerCase(Locale.ROOT) : jdbc(value)); }
+                case EQ -> { predicates.add(expression + " = ?"); args.add(normalized ? TextNormalization.value(condition, value) : text ? value.toString().toLowerCase(Locale.ROOT) : jdbc(value)); }
                 case DEFAULT -> {
                     predicates.add(text ? expression + " LIKE ? ESCAPE '!'" : column + " = ?");
                     args.add(text ? "%" + escapeLike(value.toString().toLowerCase(Locale.ROOT)) + "%" : jdbc(value));

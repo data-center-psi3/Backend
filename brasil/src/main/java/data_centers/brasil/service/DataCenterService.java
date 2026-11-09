@@ -22,6 +22,9 @@ public class DataCenterService {
     public Page<DataCenterResponse> list(MultiValueMap<String, String> filters, Pageable pageable) {
         return repository.findAll(JpaFilters.<DataCenter>specification(filterParser.parse(filters, FilterResource.DATA_CENTER)), pageable).map(DataCenterMapper::toResponse);
     }
+    public long count(MultiValueMap<String, String> filters) {
+        return repository.count(JpaFilters.<DataCenter>specification(filterParser.parse(filters, FilterResource.DATA_CENTER)));
+    }
     public DataCenterResponse get(Integer id) { return DataCenterMapper.toResponse(find(id)); }
     private DataCenter find(Integer id) { return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("DataCenter", id)); }
     @Transactional

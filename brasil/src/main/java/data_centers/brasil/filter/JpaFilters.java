@@ -27,13 +27,14 @@ public final class JpaFilters {
     private static Predicate predicate(Path<?> path, FilterCondition condition, CriteriaBuilder cb) {
         Object value = condition.values().getFirst();
         boolean text = condition.field().type() == TEXT;
-        Expression<?> expression = text ? cb.lower(path.as(String.class)) : path;
+        boolean normalized = text && TextNormalization.applies(condition);
+        Expression<?> expression = normalized ? TextNormalization.expression(path.as(String.class), cb) : text ? cb.lower(path.as(String.class)) : path;
         return switch (condition.operator()) {
             case IS_NULL -> Boolean.TRUE.equals(value) ? cb.isNull(path) : cb.isNotNull(path);
             case MIN -> cb.greaterThanOrEqualTo((Expression) path, (Comparable) value);
             case MAX -> cb.lessThanOrEqualTo((Expression) path, (Comparable) value);
-            case IN -> expression.in(condition.values().stream().map(v -> text ? v.toString().toLowerCase(Locale.ROOT) : v).toList());
-            case EQ -> cb.equal(expression, text ? value.toString().toLowerCase(Locale.ROOT) : value);
+            case IN -> expression.in(condition.values().stream().map(v -> normalized ? TextNormalization.value(condition, v) : text ? v.toString().toLowerCase(Locale.ROOT) : v).toList());
+            case EQ -> cb.equal(expression, normalized ? TextNormalization.value(condition, value) : text ? value.toString().toLowerCase(Locale.ROOT) : value);
             case DEFAULT -> text
                 ? cb.like((Expression<String>) expression, "%" + SqlFilters.escapeLike(value.toString().toLowerCase(Locale.ROOT)) + "%", '!')
                 : cb.equal(path, value);

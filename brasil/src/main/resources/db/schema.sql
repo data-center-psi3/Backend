@@ -112,3 +112,13 @@ CREATE INDEX idx_beneficio_data_center_id ON beneficio(data_center_id);
 CREATE INDEX idx_conteudo_pesquisa_data_center_id ON conteudo_pesquisa(data_center_id);
 CREATE INDEX idx_conteudo_pesquisa_categoria ON conteudo_pesquisa(categoria);
 CREATE INDEX idx_data_center_importacao_municipio ON data_center_importacao(municipio);
+
+-- Persistent agent conversation storage.
+CREATE TABLE IF NOT EXISTS agent_conversation (
+    id UUID PRIMARY KEY,
+    owner_name VARCHAR(255) NOT NULL,
+    history_json TEXT NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_agent_conversation_owner ON agent_conversation(owner_name);

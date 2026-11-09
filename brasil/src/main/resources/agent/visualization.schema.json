@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DataTerra Visualization 1.0",
+  "type": "object",
+  "required": ["schemaVersion", "type", "data", "metadata"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "datasetId": { "type": "string" },
+    "type": { "enum": ["chart", "table"] },
+    "chartType": { "enum": ["bar", "horizontalBar", "pie", "donut", "doughnut", "line", "area", "scatter"] },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "data": { "type": "array", "items": { "type": "object" } },
+    "rows": { "type": "array", "items": { "type": "object" } },
+    "columns": { "type": "array", "items": { "$ref": "#/$defs/column" } },
+    "encoding": {
+      "type": "object", "required": ["x", "y"],
+      "properties": {
+        "x": { "$ref": "#/$defs/axis" }, "y": { "$ref": "#/$defs/axis" },
+        "color": { "$ref": "#/$defs/axis" },
+        "theta": { "$ref": "#/$defs/axis" },
+        "tooltip": { "type": "array", "items": { "$ref": "#/$defs/column" } }
+      }, "additionalProperties": false
+    },
+    "sort": { "type": "array", "items": { "type": "object", "required": ["field", "direction"], "properties": { "field": { "type": "string" }, "direction": { "enum": ["ascending", "descending"] } }, "additionalProperties": false } },
+    "groupBy": { "type": "array", "items": { "type": "string" } },
+    "legend": { "type": "object" },
+    "preferredPresentation": { "type": "object" },
+    "dimension": { "type": "string" },
+    "metric": { "type": "string" },
+    "totalElements": { "type": "integer", "minimum": -1 },
+    "complete": { "type": "boolean" },
+    "metadata": {
+      "type": "object", "required": ["status", "returnedRecords", "complete"],
+      "properties": {
+        "status": { "enum": ["ok", "empty", "unsupported", "no_data", "limit_exceeded"] },
+        "returnedRecords": { "type": "integer", "minimum": 0 },
+        "complete": { "type": "boolean" },
+        "totalRecords": { "type": "integer", "minimum": -1 }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "column": { "type": "object", "required": ["field", "title", "type"], "properties": { "field": { "type": "string" }, "title": { "type": "string" }, "type": { "enum": ["nominal", "quantitative", "temporal", "unknown"] } } },
+    "axis": { "allOf": [{ "$ref": "#/$defs/column" }], "properties": { "fields": { "type": "array", "items": { "type": "string" } }, "format": { "enum": ["", "integer", "decimal", "percent"] }, "unit": { "type": "string" }, "normalization": { "const": "percent" }, "denominator": { "type": "number", "exclusiveMinimum": 0 } } }
+  }
+}

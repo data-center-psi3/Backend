@@ -79,23 +79,14 @@ public class NewsCollectorService {
             System.out.println("Notícia: " + title);
             System.out.println("URL Google: " + urlGoogle);
 
-            // 2. Tenta descobrir a URL original da reportagem
-            String urlOriginal = resolverUrlOriginal(urlGoogle);
-
-            // 3. Extrai a imagem do site que publicou a notícia
-            String imagemUrl = null;
-
-            if (urlOriginal != null && !urlOriginal.isBlank()) {
-                System.out.println("URL original: " + urlOriginal);
-
-                imagemUrl = extrairImagem(urlOriginal);
-            } else {
-                System.out.println("Não foi possível resolver a URL original.");
-            }
-
-            // 4. Define a imagem da notícia
-            if (imagemUrl != null) {
-                news.setImagemUrl(imagemUrl);
+            if (news.getImagemUrl() == null || news.getImagemUrl().isBlank()) {
+                String urlOriginal = resolverUrlOriginal(urlGoogle);
+                if (urlOriginal != null) {
+                    String imagemUrl = extrairImagem(urlOriginal);
+                    if (imagemUrl != null) {
+                        news.setImagemUrl(imagemUrl);
+                    }
+                }
             }
 
             // 5. Define a data de publicação
@@ -161,7 +152,7 @@ public class NewsCollectorService {
             }
 
             for (Element imagem : doc.select(
-                    "meta[property=og:image], meta[property=og:image:url], "
+                    "meta[property=og:image], meta[property=og:image:url], meta[property=og:image:secure_url], "
                             + "meta[name=twitter:image], meta[property=twitter:image]")) {
                 if (imagem.attr("content").isBlank()) {
                     continue;
@@ -171,6 +162,19 @@ public class NewsCollectorService {
                 if (imagemUrl.startsWith("https://") || imagemUrl.startsWith("http://")) {
                     System.out.println("Imagem encontrada: " + imagemUrl);
                     return imagemUrl;
+                }
+            }
+
+            for (Element imagem : doc.select("link[rel=image_src][href], article figure img, "
+                    + "article img[itemprop=image]")) {
+                for (String atributo : new String[]{"href", "data-src", "data-lazy-src", "src"}) {
+                    if (imagem.attr(atributo).isBlank()) {
+                        continue;
+                    }
+                    String imagemUrl = imagem.absUrl(atributo);
+                    if (imagemUrl.startsWith("https://") || imagemUrl.startsWith("http://")) {
+                        return imagemUrl;
+                    }
                 }
             }
 

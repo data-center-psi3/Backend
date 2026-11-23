@@ -1,6 +1,8 @@
-# DataTerra AI: busca geográfica, conversas e observabilidade
+# DataTerra AI: busca geográfica, conversas, visualizações e observabilidade
 
 Este documento complementa o [README do agente](README-AGENTE.md) e descreve o contrato com memória persistente.
+
+Atualizado em 12/11/2026 conforme a implementação local. Inclui recuperação de conversas, datasets paginados e planos de tabelas/gráficos validados pelo backend.
 
 ## Implantação
 
@@ -76,15 +78,15 @@ Pessoas que compartilham exatamente a mesma credencial compartilham a identidade
 
 A cada mensagem, o backend recupera a conversa pelo par UUID/usuário. IDs inexistentes, expirados ou pertencentes a outro usuário produzem a mesma resposta 404.
 
-Cada turno persistido contém pergunta, resposta, origem, data e resumos estruturados de ferramentas. Contagens e datas são mantidas; listas históricas são amostras de até dez registros, com indicação de omissão. Strings extensas são limitadas no resumo.
+Cada turno persistido contém pergunta, resposta, origem, data e evidências estruturadas de ferramentas. Os resultados são preservados enquanto couberem nos limites da memória; não existe uma amostragem fixa de dez registros. Quando um turno isolado excede o limite, a resposta é reduzida a até 2000 caracteres e resultados tabulares são substituídos por referências com registros vazios, metadados e `_requiresRefresh=true`. Se ainda exceder o limite, os resultados são substituídos por uma mensagem que solicita nova consulta.
 
-O SQL bruto é associado ao resultado em metadados internos persistidos. As strings SQL são preservadas integralmente, sem a truncagem aplicada aos textos comuns; se os limites exigirem omitir o resultado inteiro, seu SQL também deixa de estar disponível. Esses metadados não são enviados ao Gemini nem aos logs. Não é necessária migração adicional da tabela, pois o histórico já é JSON em TEXT.
+O SQL bruto é associado ao resultado em metadados internos persistidos. Enquanto a evidência integral é mantida, as strings SQL são preservadas sem truncagem. A redução para referências pode remover esses metadados, mesmo preservando a requisição necessária para consultar o dataset novamente. O SQL interno não é enviado ao Gemini nem aos logs. Não é necessária migração adicional da tabela, pois o histórico já é JSON em TEXT.
 
 Os SQLs históricos são selecionados pelas evidências realmente reutilizadas, não por uma cópia de todas as queries da conversa. Atualizar a comparação devolve SQL das novas execuções com consultaOrigem atual. Comparar uma contagem histórica com outra obtida agora produz mista. As strings podem se repetir: duas contagens com parâmetros distintos podem ter o mesmo texto preparado com interrogações.
 
 Conversas criadas antes dessa atualização podem não conter SQL salvo. Nesses casos o backend não inventa nem reconstrói a query; peça uma atualização dos dados para registrar novas consultas. Respostas conceituais não herdam SQL de mensagens anteriores.
 
-O histórico enviado ao modelo contém as mensagens anteriores e os resultados como dados históricos, não como instruções. Não são reconstruídas chamadas de função fictícias ou assinaturas artificiais. No turno vivo, o protocolo continua preservando as assinaturas reais do Gemini.
+O histórico enviado ao modelo identifica os resultados como dados históricos, não como instruções. Para resultados tabulares, envia esquema e metadados do dataset em vez de todas as linhas; a resposta anterior do assistente também é substituída por uma indicação de que os resultados estão preservados no backend. Não são reconstruídas chamadas de função fictícias ou assinaturas artificiais. No turno vivo, o protocolo continua preservando as assinaturas reais do Gemini.
 
 A memória é lida do banco em cada requisição e sobrevive à recriação do serviço ou ao reinício da aplicação. Não depende de variáveis locais ou logs.
 
@@ -134,9 +136,77 @@ Comparações históricas são identificadas como baseadas nas consultas anterio
 
 O [prompt inicial](src/main/resources/agent/system-prompt.txt) orienta a resolver referências pelo histórico e a pedir esclarecimento quando ele for insuficiente. A seleção das ferramentas continua sendo feita pelo Gemini; não foi adicionado um classificador geral por palavras-chave.
 
-O [AgentToolDeclarations.java](src/main/java/data_centers/brasil/agent/tool/AgentToolDeclarations.java) declara essa terceira ferramenta. O [AgentFallbackFormatter.java](src/main/java/data_centers/brasil/agent/formatter/AgentFallbackFormatter.java) também apresenta seus resultados quando o Gemini falha.
+O [AgentToolDeclarations.java](src/main/java/data_centers/brasil/agent/tool/AgentToolDeclarations.java) declara `comparar_contagens` junto de `consultar_dataterra`, `resposta_conceitual` e `planejar_visualizacao`. O [AgentFallbackFormatter.java](src/main/java/data_centers/brasil/agent/formatter/AgentFallbackFormatter.java) também apresenta resultados de comparação quando o Gemini falha.
 
 Chamadas idênticas à ferramenta de banco no mesmo turno reutilizam o resultado sem repetir a consulta. Novos turnos não reutilizam esse cache de requisição. A ferramenta de comparação tem sua política histórica explícita.
+
+## Recuperação de conversas
+
+Os endpoints usam a identidade autenticada, sem aceitar um proprietário informado pelo cliente:
+
+| Endpoint GET | Resposta |
+| --- | --- |
+| `/api/agent/conversations` | Lista de até 100 conversas com versão maior que zero, em ordem de atualização decrescente: `id`, `title`, `updatedAt`, `expired`. |
+| `/api/agent/conversations/{id}` | Objeto com `id`, `messages` e `expired`. Cada mensagem contém `role` (`user` ou `assistant`) e `content`. |
+
+O título usa até 100 caracteres da primeira pergunta ainda retida. A leitura devolve as mensagens que permaneceram após os limites de memória, sem reconstruir turnos removidos ou devolver as evidências internas e especificações visuais. Conversas expiradas continuam disponíveis nesses GETs com `expired=true`; tentar continuá-las pelo chat ou acessar seus datasets retorna 404. A listagem não oferece paginação e não há endpoint de exclusão implementado nesses controllers.
+
+Implementação: [AgentConversationsController.java](src/main/java/data_centers/brasil/agent/controller/AgentConversationsController.java) e [AgentConversationService.java](src/main/java/data_centers/brasil/agent/memory/AgentConversationService.java).
+
+## Tabelas e gráficos
+
+A resposta de chat acrescenta `chartData` e `visualization` ao contrato existente. Ambos carregam a mesma especificação declarativa e podem ser nulos. O frontend deve renderizar apenas uma das representações para evitar duplicação. Não é uma imagem pronta nem código executável.
+
+A ferramenta `planejar_visualizacao` propõe `datasetId`, `type` (`table` ou `chart`), `chartType`, título, descrição e campos como `x`, `y`, `series` e `yFields`. Os valores vêm das consultas autorizadas preservadas pelo backend. Campos desconhecidos, tipos incompatíveis, unidades não confirmadas e configurações não autorizadas são rejeitados.
+
+Tipos disponíveis: `bar`, `horizontalBar`, `pie`, `donut`, `line`, `area` e `scatter`. Um tipo explicitamente solicitado tem prioridade sobre a proposta do modelo e a recomendação automática. Pizza ou rosca com muitas categorias recebe aviso, preservando o tipo solicitado e os registros. Linha e área exigem dimensão temporal real; dispersão exige eixo X numérico. Pizza e rosca não aceitam múltiplas séries, valores negativos ou soma zero. Valores nulos devem permanecer nulos no frontend.
+
+A especificação usa `schemaVersion: "1.0"`, `type`, `title`, `description`, `datasetId`, `data` e `metadata`. Tabelas incluem `columns` e `rows`; gráficos incluem `chartType`, `encoding` e `legend`. Os aliases `totalElements` e `complete` permanecem disponíveis. `sort` e `groupBy` descrevem a apresentação; não autorizam SQL nem agregações inventadas pelo cliente. As agregações já vêm das consultas autorizadas.
+
+Os metadados incluem `totalRecords`, `returnedRecords`, `totalKnown`, `complete`, origem, consultas com filtros/datas, datasets disponíveis e `dataEndpoint`. Percentuais indicam denominador e escopo: `full_dataset` ou `returned_records_only`. Não interprete uma participação sobre registros parciais como participação sobre toda a base.
+
+Em pedidos como “agora em tabela” e “transforme em rosca”, o agente pode reutilizar o dataset e o plano histórico sem consultar novamente. Se os registros tiverem sido removidos pelos limites de memória, a requisição preservada permite recuperá-los novamente; isso pode produzir dados atuais. Em incompatibilidades, o fallback pode retornar tabela com `metadata.status=unsupported` e uma explicação. Sem evidência disponível, informa `no_data`; limites excedidos usam `limit_exceeded` e orientam buscar páginas.
+
+| Configuração | Padrão |
+| --- | --- |
+| `agent.visualization.max-records` | 2000 registros |
+| `agent.visualization.max-bytes` | 1000000 bytes |
+| `agent.visualization.max-series` | 20 séries |
+| `agent.query.max-records` | 2000 registros na recuperação automática |
+| `agent.query.max-pages` | 100 páginas na recuperação automática |
+
+São propriedades Spring com defaults no código. O limite de bytes considera a duplicação dos aliases visuais e os metadados; não garante que todo dataset com até 2000 registros caiba na resposta. Quando necessário, o backend devolve os arrays de dados vazios com a indicação do limite, sem apresentar um recorte silencioso como completo.
+
+Arquivos principais:
+
+- [AgentDatasetService.java](src/main/java/data_centers/brasil/agent/visualization/AgentDatasetService.java): adapta evidências, identifica datasets, combina páginas e infere tipos dos campos, sem juntar consultas independentes.
+- [AgentVisualizationService.java](src/main/java/data_centers/brasil/agent/visualization/AgentVisualizationService.java): valida planos, vincula valores reais, aplica limites e constrói fallback.
+- [ChartType.java](src/main/java/data_centers/brasil/agent/visualization/ChartType.java) e [VisualizationIntent.java](src/main/java/data_centers/brasil/agent/visualization/VisualizationIntent.java): tipos, aliases e intenção de apresentação.
+- [visualization.schema.json](src/main/resources/agent/visualization.schema.json): contrato declarativo de visualização.
+
+## Datasets e paginação
+
+Use `GET /api/agent/conversations/{conversationId}/datasets/{datasetId}?page=0&size=20` com a autenticação da conversa. Substitua `{conversationId}` no `metadata.dataEndpoint` pelo UUID retornado no chat. `page` aceita 0 a 1000; `size`, 1 a 50. Valores fora desses intervalos retornam 400.
+
+A resposta contém `datasetId`, `data`, `page`, `size`, `totalElements`, `hasNext` e `refreshed`. Um dataset completo é paginado sobre os registros preservados, com `refreshed=false`. Um dataset incompleto usa a última requisição autorizada para consultar a página no banco, com `refreshed=true`; portanto, não constitui um snapshot imutável. O total pode ser desconhecido (`-1`).
+
+Dataset ausente na conversa retorna 404; sem requisição preservada para recuperar dados incompletos, retorna 409 pedindo reexecução; página consultada acima de 1000000 bytes retorna 413 e pede redução de `size`. O identificador do dataset deve ser obtido da resposta, sem presumir acesso global ou sua disponibilidade após a remoção dos turnos.
+
+Pedidos de todos os registros usam recuperação automática limitada. `MUNICIPIOS` aceita `todos=true` e `ranking=true`; para top 10, use `ranking=true`, `limite=10`, `todos=false`. Recuperação completa e ranking são escolhas distintas. Os metadados de completude indicam se os limites impediram recuperar tudo.
+
+Implementação: [AgentDatasetController.java](src/main/java/data_centers/brasil/agent/controller/AgentDatasetController.java) e [AgentQueryPaginationService.java](src/main/java/data_centers/brasil/agent/service/AgentQueryPaginationService.java).
+
+Exemplo de sequência de mensagens no mesmo `conversationId`:
+
+```json
+{"message":"Mostre os municípios de São Paulo por quantidade de instalações em barras horizontais."}
+```
+
+```json
+{"conversationId":"6bffcecb-2fe0-4d25-b167-d4fa86d09130","message":"Agora em tabela."}
+```
+
+Use o ID realmente recebido na primeira resposta. Confira `metadata.complete`, `metadata.status` e as datas das evidências antes de apresentar o resultado como completo ou atualizado.
 
 ## Logs e SQL de desenvolvimento
 
@@ -200,11 +270,14 @@ Envie ao mesmo endpoint autenticado cada corpo abaixo. Sem ID, cada um cria uma 
 
 Os registros e contagens devem corresponder ao banco, não a números fixos do prompt. A listagem continua paginada; quando não reunir todas as páginas, deve indicar que o resultado é parcial.
 
-## Testes novos
+## Testes relacionados
 
 - [AgentConversationIntegrationTests.java](src/test/java/data_centers/brasil/agent/service/AgentConversationIntegrationTests.java): cinco mensagens, histórico após recriar o serviço, isolamento, TTL, conflito de versão, limites, atualização, denominador zero, ID no HTTP, debug e erros.
 - [AgentGeographyIntegrationTests.java](src/test/java/data_centers/brasil/agent/service/AgentGeographyIntegrationTests.java): cinco perguntas de Hortolândia, SQL direto de referência, estados completos, filtros por empresa/nome, Unicode, espaços e ausência de correspondência parcial.
 - [AgentObservabilityTests.java](src/test/java/data_centers/brasil/agent/service/AgentObservabilityTests.java): autorização de SQL e logs estruturados com campos protegidos redigidos.
+- [AgentVisualizationTests.java](src/test/java/data_centers/brasil/agent/service/AgentVisualizationTests.java) e [AgentVisualizationIntegrationTests.java](src/test/java/data_centers/brasil/agent/service/AgentVisualizationIntegrationTests.java): planos visuais, datasets, conversões, validações e integração.
+- [ChartTypeSelectionTests.java](src/test/java/data_centers/brasil/agent/service/ChartTypeSelectionTests.java): seleção de tipos de gráfico e aliases.
+- [AgentMunicipiosIntegrationTests.java](src/test/java/data_centers/brasil/agent/service/AgentMunicipiosIntegrationTests.java): consultas de municípios e paginação.
 
 Os testes usam Gemini simulado e consultas reais ao H2 em modo PostgreSQL. Não afirmam ter validado a interpretação de um modelo remoto nem acessam o Supabase de produção.
 
